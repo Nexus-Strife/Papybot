@@ -1,24 +1,87 @@
 <Html>
-<HEAD>
+<head>
     <title>Papybot</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
+    <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+
+$(function() {
+    $('input').keydown(function() {
+        $.ajax({
+            url: '/result',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                var obj = JSON.parse(response)
+                $('#txtHint').html(obj.txt);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+});
+
+$(function() {
+    $('button').click(function() {
+        $.ajax({
+            url: '/resultat',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                var obj1 = JSON.parse(response)
+                $('#txtHint').html(obj.txt)
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+});
+
+
+
+    </script>
 </head>
 <body>
 <br>
-<center><img src="static/header_logo.jpg" class="img-circle"></center>
+<center><img src="../static/header_logo.jpg" class="img-circle"></center>
 <form>
     <br><br><br><br>
     <center>J't'écoute mon gamin ! Qu'es'que tu cherch' ?</center>
+    <div class="row">
         <div class="col-lg-4 col-lg-offset-4">
             <label for="research"></label>
-            <input type="text" class="form-control input-sm" id="research" aria-describedby="research" placeholder="Entrez">
+            <input type="text" class="form-control input-sm" id="research" name="research" aria-describedby="research"
+                   autocomplete="off" placeholder="Entrez ce que vous chercher...">
             <small id="search" class="form-text text-muted"></small>
         </div>
+        <button type="button" class="btn btn-success" name="sub-meat" value="sub-meat">Chercher !</button>
+        <div class="col-lg-4 col-lg-offset-5"><br>
+            {% with %}
+
+            {% set location=(48.866667,2.333333) %}
+            {% set style="width:350px;height:350px;margin:0px"%}
+
+            {{
+            googlemap(
+            "simple-map",
+            location.0, location.1,
+            markers=[location,],
+            style=style
+            )
+            }}
+
+            {% endwith %}
+        </div>
+    </div>
 </form>
+<center><p>Suggestions: <span id="txtHint"></span></p></center>
 <footer class="footer">
     <div class="container">
         <div class="row">
@@ -31,4 +94,7 @@
     </div>
 </footer>
 </body>
-<html>
+<Html>
+
+
+https://assets.community.lomography.com/0b/c8d562d2916cbdd49a1dbf0d9fa287763a9ab2/768x576x2.jpg
