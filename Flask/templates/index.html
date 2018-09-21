@@ -1,4 +1,4 @@
-<Html>
+<html>
 <head>
     <title>Papybot</title>
     <meta charset="utf-8">
@@ -6,36 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s&libraries=places" async refer></script>
     <script>
 
-$(function() {
-    $('input').keydown(function() {
-        $.ajax({
-            url: '/result',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-                var obj = JSON.parse(response)
-                $('#txtHint').html(obj.txt);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-});
+var geocoder;
+var map;
+var marker;
+
+
 
 $(function() {
     $('button').click(function() {
         $.ajax({
-            url: '/resultat',
+            url: '/update_map',
             data: $('form').serialize(),
             type: 'POST',
             success: function(response) {
                 console.log(response);
                 var obj1 = JSON.parse(response)
-                $('#txtHint').html(obj.txt)
+                $('#txtHint').html(obj1.txt)
+
             },
             error: function(error) {
                 console.log(error);
@@ -45,8 +35,70 @@ $(function() {
 });
 
 
+function initMap() {
+  geocoder = new google.maps.Geocoder();
+  map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 48.8747613, lng: 2.348376},
+      zoom: 16,
+      mapTypeId: 'terrain'
+  });
+  marker = new google.maps.Marker({
+      map: map,
+      draggable: false,
+      animation: google.maps.Animation.DROP,
+      position: {lat: 48.8747613, lng: 2.348376},
+      title: "Marker de Papy"
+  });
+}
 
-    </script>
+
+$('#map').ready(function() {
+    initMap();
+});
+
+function placeMarker(location) {
+    if (marker) {
+        //if marker already was created change positon
+        marker.setPosition(location);
+    } else {
+        //create a marker
+        marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            draggable: false,
+            animation: google.maps.Animation.DROP
+        });
+    }
+}
+
+function codeAddress() {
+    var address = document.getElementById('research').value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == 'OK') {
+        map.setCenter(results[0].geometry.location);
+        placeMarker(results[0].geometry.location);
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
+
+
+
+</script>
+
+<style>
+
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 350px;
+        width: 350px;
+
+      }
+
+</style>
+
 </head>
 <body>
 <br>
@@ -61,27 +113,12 @@ $(function() {
                    autocomplete="off" placeholder="Entrez ce que vous chercher...">
             <small id="search" class="form-text text-muted"></small>
         </div>
-        <button type="button" class="btn btn-success" name="sub-meat" value="sub-meat">Chercher !</button>
-        <div class="col-lg-4 col-lg-offset-5"><br>
-            {% with %}
-
-            {% set location=(48.866667,2.333333) %}
-            {% set style="width:350px;height:350px;margin:0px"%}
-
-            {{
-            googlemap(
-            "simple-map",
-            location.0, location.1,
-            markers=[location,],
-            style=style
-            )
-            }}
-
-            {% endwith %}
+        <button type="button" class="btn btn-success" name="submit" value="submit" onclick="codeAddress()">Chercher !</button>
+        <div class="col-lg-4 col-lg-offset-5" id="map"><br>
         </div>
     </div>
 </form>
-<center><p>Suggestions: <span id="txtHint"></span></p></center>
+<center><p>Suggestions: <span id="txtHint">{{ page_input }}</span></p></center>
 <footer class="footer">
     <div class="container">
         <div class="row">
@@ -94,7 +131,4 @@ $(function() {
     </div>
 </footer>
 </body>
-<Html>
-
-
-https://assets.community.lomography.com/0b/c8d562d2916cbdd49a1dbf0d9fa287763a9ab2/768x576x2.jpg
+<html>
