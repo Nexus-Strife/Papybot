@@ -2,6 +2,8 @@ from flask import Flask, render_template, request  # Import of the flask's lib
 from flask_googlemaps import GoogleMaps
 import json
 import wikipediaapi
+import random
+import time
 
 
 app = Flask(__name__) # Initialization of Flask
@@ -9,23 +11,30 @@ app = Flask(__name__) # Initialization of Flask
 GoogleMaps(app, key='AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s')
 
 wiki_wiki = wikipediaapi.Wikipedia('fr')  # Initialization of Wikipedia API
-page_paris = wiki_wiki.page("Nintendo")
-city = ["Paris"]
+
+positive_anwser_list = ["J'vais te dire c'que j'sais mon gamin. ", "J'vais t'dire mon lapin: ", "Oh je connais"
+                        " des choses sur cet endroit ! ",
+                        "Ca fait un bout d'temps qu'j'ai pas mis les pieds là-bas mon p'tiot ! Et j'en connais"
+                        " un rayon sur cet endroit ! "]
+
+negative_anwser_list = ["...Pardon.. ?", "De quoi ? J'connais pas mon lapin", "C'est ou ça ?", "...C'est nouveau ? Ca"
+                                                                                               "m'dit rien ton affaire"]
+
+know_address_list = ["Voui ! L'adresse c'était...c'était quoi déjà ? Ah voui ! c'était: ", "J'connais cette adresse ! ",
+                     "J'connais cette adresse là-bas: "]
 susp = "..."
+
+
+def papy_anwser(anwser_lst):
+    rand = random.randint(0, len(anwser_lst) - 1)
+    string = anwser_lst[rand]
+    return string
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
-    paris = "Paris"
-
-    if paris in city:
-        wiki_desc = page_paris.summary[0:295]
-        response = render_template("index.html", wiki_desc=wiki_desc)
-        return response
-    else:
-        wiki_desc = page_paris.summary[0:295]
-        return render_template("index.html")
+    return render_template("index.html")
 
 
 @app.route("/update_map", methods=['GET', 'POST'])
@@ -44,7 +53,7 @@ def update_map():
             page_in_wiki = wiki_wiki.page(words)
             exist = page_in_wiki.exists()
 
-            if exist == False:  # Si la page du mot en cours n'existe pas
+            if not exist:  # Si la page du mot en cours n'existe pas
 
                 if word_lowercase in stop_words_json["stop_words"]:
                     pass
@@ -58,19 +67,28 @@ def update_map():
                 else:
 
                     page_to_read = wiki_wiki.page(words)
-                    text = page_to_read.summary[0:300]
+                    text = page_to_read.summary[0:400]
 
-                    if not text:
-                        print("J'sais pas grand chose là d'sus mon p'tit gars")
-                        # rajouter adresse
+                    if text == "":
+                        negative_anwser = (papy_anwser(negative_anwser_list))
+                        return json.dumps({'status': 'OK', 'answer': negative_anwser});
+
                     else:
-                       text_susp = text + susp
-                       print("J'vais te dire c'que j'sais mon gamin. " + text_susp)
-                       print(page_to_read.fullurl)
-                       # rajouter url wiki et adresse
+                        text_susp = text + susp
+                        positive_answer = (papy_anwser(positive_anwser_list) + text_susp)
+                        link_wiki = page_to_read.fullurl
 
-    return json.dumps({'status': 'OK'});
+                        time.sleep(4)
+                        return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
+
+
+@app.route("/answer", methods=["POST", "GET"])
+def answer():
+
+    know_address = papy_anwser(know_address_list)
+
+    return json.dumps({'status': 'OK', 'know': know_address});
 
 
 if __name__ == "__main__":
-    app.run(debug=True)  # Run local server. Mode debug on for developpment
+    app.run(debug=True)  # Run local server. Mode debug on for dev
