@@ -1,31 +1,38 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <title>Papybot</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s&libraries=places" async refer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script>
 
 var geocoder;
 var map;
 var marker;
 
-
-
 $(function() {
-    $('button').click(function() {
+    $('.btn').on('click', function() {
+        var $this = $(this);
+        $this.button('loading');
         $.ajax({
             url: '/update_map',
             data: $('form').serialize(),
             type: 'POST',
             success: function(response) {
                 console.log(response);
-                var obj1 = JSON.parse(response)
-                $('#txtHint').html(obj1.txt)
-
+                var obj = JSON.parse(response);
+                var audio = new Audio('/static/notif.wav');
+                audio.play();
+                $("#txtHint").text(obj.answer);
+                $("#link").attr("href", obj.link);
+                $("#wiki").text("La suite sur Wikipédia");
+                $this.button('reset');
             },
             error: function(error) {
                 console.log(error);
@@ -34,6 +41,77 @@ $(function() {
     });
 });
 
+
+$(function() {
+    $('button').click(function() {
+        $.ajax({
+            url: '/answer',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                var ans = JSON.parse(response);
+                setTimeout(codeAddress(), 2000);
+                $("#know_it").text(ans.know);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+});
+
+$(function() {
+  $('#research').keypress(function(e) {
+       if(e.which == 13) {
+           event.preventDefault();
+
+           $.ajax({
+               url: '/answer',
+               data: $('form').serialize(),
+               type: 'POST',
+               success: function(response) {
+                   console.log(response);
+                   var ans = JSON.parse(response);
+                   setTimeout(codeAddress(), 2000);
+                   $("#know_it").text(ans.know);
+
+               },
+               error: function(error) {
+                  console.log(error);
+               },
+           });
+       }
+  });
+});
+
+$(function() {
+$('#research').keypress(function(e) {
+    if(e.which == 13) {
+        var $this = $('#submit');
+        $this.button('loading');
+        event.preventDefault();
+        $.ajax({
+            url: '/update_map',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                var obj = JSON.parse(response);
+                var audio = new Audio('/static/notif.wav');
+                audio.play();
+                $("#txtHint").text(obj.answer);
+                $("#link").attr("href", obj.link);
+                $("#wiki").text("La suite sur Wikipédia");
+                $this.button('reset');
+            },
+            error: function(error) {
+                console.log(error);
+            },
+        });
+     }
+});
+});
 
 function initMap() {
   geocoder = new google.maps.Geocoder();
@@ -45,7 +123,7 @@ function initMap() {
   marker = new google.maps.Marker({
       map: map,
       draggable: false,
-      animation: google.maps.Animation.DROP,
+      animation: google.maps.Animation.BOUNCE,
       position: {lat: 48.8747613, lng: 2.348376},
       title: "Marker de Papy"
   });
@@ -71,19 +149,23 @@ function placeMarker(location) {
     }
 }
 
+
 function codeAddress() {
     var address = document.getElementById('research').value;
     geocoder.geocode( { 'address': address}, function(results, status) {
     if (status == 'OK') {
+        var audio = new Audio('/static/notif.wav');
+        audio.play();
+        var here = results[0].formatted_address
         map.setCenter(results[0].geometry.location);
         placeMarker(results[0].geometry.location);
+        $("#address").text(here);
       } else {
-        alert('Geocode was not successful for the following reason: ' + status);
+        $("#know_it").text("Ca m'dit rien tout ça, t'es sûr qu'c'est sur terre mon gamin ?");
+
       }
     });
   }
-
-
 
 </script>
 
@@ -96,6 +178,7 @@ function codeAddress() {
         width: 350px;
 
       }
+
 
 </style>
 
@@ -113,12 +196,12 @@ function codeAddress() {
                    autocomplete="off" placeholder="Entrez ce que vous chercher...">
             <small id="search" class="form-text text-muted"></small>
         </div>
-        <button type="button" class="btn btn-success" name="submit" value="submit" onclick="codeAddress()">Chercher !</button>
+        <button type="button" class="btn btn-success" name="submit" value="submit" id="submit" data-loading-text="<i class='fa fa-gear fa-spin'></i> Je réfléchis à un truc...">Chercher !</button>
         <div class="col-lg-4 col-lg-offset-5" id="map"><br>
         </div>
     </div>
 </form>
-<center><p>Suggestions: <span id="txtHint">{{ page_input }}</span></p></center>
+<center><p><span id="know_it"></span><span id="address"></span><br><br><span id="txtHint"></span><a href="" id="link"><span id="wiki"></span></a></p></center>
 <footer class="footer">
     <div class="container">
         <div class="row">
