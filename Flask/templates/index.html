@@ -5,182 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s&libraries=places" async refer></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <script src="../static/GoogleMap.js"></script>
+    <script src="../static/Reqs.js"></script>
     <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <script>
+    </script>
+    <style>
 
-var geocoder;
-var map;
-var marker;
-
-$(function() {
-    $('.btn').on('click', function() {
-        var $this = $(this);
-        $this.button('loading');
-        $.ajax({
-            url: '/update_map',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-                var obj = JSON.parse(response);
-                var audio = new Audio('/static/notif.wav');
-                audio.play();
-                $("#txtHint").text(obj.answer);
-                $("#link").attr("href", obj.link);
-                $("#wiki").text("La suite sur Wikipédia");
-                $this.button('reset');
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-});
-
-
-$(function() {
-    $('button').click(function() {
-        $.ajax({
-            url: '/answer',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-                var ans = JSON.parse(response);
-                setTimeout(codeAddress(), 2000);
-                $("#know_it").text(ans.know);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-});
-
-$(function() {
-  $('#research').keypress(function(e) {
-       if(e.which == 13) {
-           event.preventDefault();
-
-           $.ajax({
-               url: '/answer',
-               data: $('form').serialize(),
-               type: 'POST',
-               success: function(response) {
-                   console.log(response);
-                   var ans = JSON.parse(response);
-                   setTimeout(codeAddress(), 2000);
-                   $("#know_it").text(ans.know);
-
-               },
-               error: function(error) {
-                  console.log(error);
-               },
-           });
-       }
-  });
-});
-
-$(function() {
-$('#research').keypress(function(e) {
-    if(e.which == 13) {
-        var $this = $('#submit');
-        $this.button('loading');
-        event.preventDefault();
-        $.ajax({
-            url: '/update_map',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-                var obj = JSON.parse(response);
-                var audio = new Audio('/static/notif.wav');
-                audio.play();
-                $("#txtHint").text(obj.answer);
-                $("#link").attr("href", obj.link);
-                $("#wiki").text("La suite sur Wikipédia");
-                $this.button('reset');
-            },
-            error: function(error) {
-                console.log(error);
-            },
-        });
-     }
-});
-});
-
-function initMap() {
-  geocoder = new google.maps.Geocoder();
-  map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: 48.8747613, lng: 2.348376},
-      zoom: 16,
-      mapTypeId: 'terrain'
-  });
-  marker = new google.maps.Marker({
-      map: map,
-      draggable: false,
-      animation: google.maps.Animation.BOUNCE,
-      position: {lat: 48.8747613, lng: 2.348376},
-      title: "Marker de Papy"
-  });
-}
-
-
-$('#map').ready(function() {
-    initMap();
-});
-
-function placeMarker(location) {
-    if (marker) {
-        //if marker already was created change positon
-        marker.setPosition(location);
-    } else {
-        //create a marker
-        marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            draggable: false,
-            animation: google.maps.Animation.DROP
-        });
+    /* Always set the map height explicitly to define the size of the div
+    * element that contains the map. */
+    #map {
+       height: 350px;
+       width: 350px;
     }
-}
-
-
-function codeAddress() {
-    var address = document.getElementById('research').value;
-    geocoder.geocode( { 'address': address}, function(results, status) {
-    if (status == 'OK') {
-        var audio = new Audio('/static/notif.wav');
-        audio.play();
-        var here = results[0].formatted_address
-        map.setCenter(results[0].geometry.location);
-        placeMarker(results[0].geometry.location);
-        $("#address").text(here);
-      } else {
-        $("#know_it").text("Ca m'dit rien tout ça, t'es sûr qu'c'est sur terre mon gamin ?");
-
-      }
-    });
-  }
-
-</script>
-
-<style>
-
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 350px;
-        width: 350px;
-
-      }
-
-
-</style>
+    </style>
 
 </head>
 <body>
@@ -207,7 +48,8 @@ function codeAddress() {
         <div class="row">
             <div class="col-lg-12">
                 <center>
-                    <a href="https://github.com/Nexus-Strife/Papybot">Lien vers projet github</a><br>Copyright B.D.
+                    <a href="https://github.com/Nexus-Strife/Papybot">Lien vers projet github</a><br>Copyright B.D.<br>
+                    <a href="https://www.linkedin.com/in/benjamin-duplan-475aba153/">Profil Linkedin</a>
                 </center>
             </div>
         </div>
