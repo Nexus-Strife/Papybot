@@ -93,6 +93,3 @@ def answer():
 
     return json.dumps({'status': 'OK', 'know': know_address});
 
-
-if __name__ == "__main__":
-    app.run(debug=True)  # Run local server. Mode debug on for dev
