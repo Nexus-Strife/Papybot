@@ -1,2 +1,2 @@
 web: gunicorn Flask:app
-init: FLASK_APP=exec.py
+init: FLASK_APP=/Flask/views.py
