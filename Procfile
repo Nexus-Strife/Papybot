@@ -1,1 +1,1 @@
-web: gunicorn Flask.views:app
+web: gunicorn Flask.exec:app
