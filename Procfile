@@ -1,2 +1,1 @@
-web: gunicorn app:app
-init: FLASK_APP=/Flask/views.py
+heroku ps:scale web=1
