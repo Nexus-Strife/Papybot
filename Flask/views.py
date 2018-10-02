@@ -47,7 +47,7 @@ def update_map():
         return json.dumps({'status': 'OK', 'answer': ""});  # If var is empty then return an empty answer
 
     else:
-        stop_words_json = json.loads(open("Flask/static/stop_words_fr.json").read())
+        stop_words_json = json.loads(open("static/stop_words_fr.json").read())
 
         for words in var.split():  # Begin the parsing of every word
             word_lowercase = words.lower()  # Put every words into lowercase -easiest way to parse-
@@ -92,4 +92,3 @@ def answer():
     know_address = papy_answer(know_address_list)  # Pick-up a sentence from the know_address's list
 
     return json.dumps({'status': 'OK', 'know': know_address});
-
