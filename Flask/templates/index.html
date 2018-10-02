@@ -1,10 +1,10 @@
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <head>
     <title>Papybot</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s&libraries=places" async refer></script>
+    <script async refer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPEk_9cUI_Z9aeLSMn-JnnXKFjvxW7r-s&libraries=places"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
     <script src="../static/GoogleMap.js"></script>
@@ -20,14 +20,12 @@
   margin: 0 auto;
   margin-top:5px;
 }
-
 #map_container{
   position: relative;
 }
-
 #map{
     height: 40%;
-    width: 120%;
+    width: 172%;
     overflow: hidden;
     padding-top: 30px;
     position: relative;
@@ -35,6 +33,8 @@
     border-right: solid black 1px;
     border-bottom: solid black 1px;
     border-top: solid black 1px;
+    margin-top: 30px;
+    margin-left: -36%;
 }
 
 #submit
@@ -50,22 +50,20 @@ height: 30px;
 {
 height: 70px;
 width: 100%;
-margin-top: 7.3%;
-display: flex;
+margin-top: 2.1%;
 }
 
 #tchat
 {
   justify-content: flex-start;
-  height: 150px;
+  height: 130px;
   width: 50%;
   display: flex;
   flex-direction: column;
   overflow: auto;
-
 }
 
-    </style>
+</style>
 </head>
 
 <body>
@@ -76,33 +74,31 @@ display: flex;
     <center>J't'écoute mon gamin ! Qu'es'que tu cherch' ?</center>
     <div class="row">
         <div class="col-lg-4 col-lg-offset-4">
-
             <input type="text" class="form-control input-sm" id="research" name="research" aria-describedby="research"
                    autocomplete="off" placeholder="Entrez ce que vous chercher...">
         </div>
-        <button type="button" class="btn btn-success" name="submit" value="submit" id="submit" data-loading-text="<i class='fa fa-gear fa-spin'></i> Je réfléchis à un truc...">Dis moi !</button>
+            <div class="col-lg-1">
+              <center><button type="button" class="btn btn-success" name="submit" value="submit" id="submit" data-loading-text="<i class='fa fa-gear fa-spin'></i> Je réfléchis à un truc...">Dis moi !</button></center>
+            </div>
         <div class="container">
-            <div id="map_container"></div>
+            <div id="map_container">
 	            <div id="map"></div>
             </div>
         </div>
+    </div>
 </form>
 
 <div class="row">
 <div class="col-lg-offset-3 col-lg-4" id="tchat">
-<center><p><span id="know_it"></span><span id="address"></span><br><br><span id="txtHint"></span><a href="" id="link"><span id="wiki"></span></a></p></center></div></div>
+<center><p><span id="know_it"></span><span id="address"></span><br><br><span id="txtHint"></span><a href="" id="link"><span id="wiki"></span></a></p></center>
+</div>
+</div>
 
-<footer class="footer" id="pied">
-    <div class="container">
-     <div class="row">
-         <div class="col-lg-12 col-lg-offset-1">
-             <center>
-                 <a href="https://github.com/Nexus-Strife/Papybot">Lien vers projet github</a><br>Copyright B.D.<br>
-                 <a href="https://www.linkedin.com/in/benjamin-duplan-475aba153/">Profil Linkedin</a>
-             </center>
-         </div>
-     </div>
-    </div>
+<footer class="footer" id="pied" class="row">
+     <center><br>
+         <a href="https://github.com/Nexus-Strife/Papybot">Lien vers projet github</a> | <a href="https://www.linkedin.com/in/benjamin-duplan-475aba153/">Profil Linkedin</a><br>
+             Copyright B.D.
+     </center>
 </footer>
 </body>
-<html>
+</html>
