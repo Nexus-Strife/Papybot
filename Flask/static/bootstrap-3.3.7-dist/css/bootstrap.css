@@ -5519,7 +5519,7 @@ button.list-group-item-danger.active:focus {
   border-top-width: 0;
 }
 .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 100%;
     height: 60px;
