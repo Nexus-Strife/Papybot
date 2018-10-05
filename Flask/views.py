@@ -3,7 +3,6 @@ import json  # Json plugin is needed for read the stop words's list and respond 
 import wikipediaapi  # Plugin used to make req to wikipedia, listed on mediawiki
 import random  # The random lib is used to take random sentence for the answers
 import time  # time.sleep
-import itertools
 
 
 app = Flask(__name__)  # Initialization of Flask
@@ -21,7 +20,6 @@ negative_answer_list = ["...Pardon.. ?", "De quoi ? J'connais pas mon lapin", "C
 know_address_list = ["Voui ! L'adresse c'était...c'était quoi déjà ? Ah voui ! c'était: ", "J'connais cette adresse ! ",
                      "J'connais cette adresse là-bas: "]
 
-places_list = ["Canadiens", "Montréal", "Tour", "Eiffel", "Catacombes", "Trois", "Rivières"]
 susp = "..."
 
 
@@ -51,7 +49,7 @@ def update_map():
         return json.dumps({'status': 'OK', 'answer': ""});  # If var is empty then return an empty answer
 
     else:
-        stop_words_json = json.loads(open("/Flask/static/stop_words_fr.json").read())
+        stop_words_json = json.loads(open("Flask/static/stop_words_fr.json").read())
 
         try:
 
