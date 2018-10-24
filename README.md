@@ -19,3 +19,5 @@ Une fois sur l'interface utilisateur, il suffit simplement de demander un lieu o
 - Ou est-ce <localité> ?
 - Tu connais un cinéma à <localité> ?
 - Je cherche une pharmacie à <localité> papy
+- Ou se trouve la tour eiffel ?
+- Qui sont les Canadiens de Montréal papy ?
