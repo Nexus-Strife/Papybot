@@ -49,7 +49,7 @@ def update_map():
         return json.dumps({'status': 'OK', 'answer': ""});  # If var is empty then return an empty answer
 
     else:
-        stop_words_json = json.loads(open("/static/stop_words_fr.json").read())
+        stop_words_json = json.loads(open("../static/stop_words_fr.json").read())
 
         try:
 
