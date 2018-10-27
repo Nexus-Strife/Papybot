@@ -3,7 +3,7 @@ import json  # Json plugin is needed for read the stop words's list and respond 
 import wikipediaapi  # Plugin used to make req to wikipedia, listed on mediawiki
 import random  # The random lib is used to take random sentence for the answers
 import time  # time.sleep
-
+import requests
 
 app = Flask(__name__)  # Initialization of Flask
 
@@ -17,7 +17,7 @@ positive_answer_list = ["J'vais te dire c'que j'sais mon gamin. ", "J'vais t'dir
 negative_answer_list = ["...Pardon.. ?", "De quoi ? J'connais pas mon lapin", "C'est ou ça ?", "...C'est nouveau ? Ca"
                                                                                                " m'dit rien ton affaire"]
 
-know_address_list = ["Voui ! L'adresse c'était...c'était quoi déjà ? Ah voui ! c'était: ", "J'connais cette adresse ! ",
+know_address_list = ["Voui ! L'adresse c'était...c'était quoi déjà ? Ah voui ! C'était: ", "J'connais cette adresse ! ",
                      "J'connais cette adresse là-bas: "]
 
 susp = "..."
@@ -49,61 +49,29 @@ def update_map():
         return json.dumps({'status': 'OK', 'answer': ""});  # If var is empty then return an empty answer
 
     else:
-        stop_words_json = json.loads(open("Flask/static/stop_words_fr.json").read())
+        stop_words_json = json.loads(open("static/stop_words_fr.json").read())
 
         try:
 
             place = next(words for words in stop_words_json["places"] if words in var.lower())  # List comprehension
 
-            if place == "tour eiffel":
-                place_url = wiki_wiki.page("tour_Eiffel")
-                text = place_url.summary[0:400]
-                text_susp = text + susp  # Put in var the 400 chars + ellipsis
-                positive_answer = (papy_answer(positive_answer_list) + text_susp)  # Pick-up a random sentence from the positive answer's list
-                link_wiki = place_url.fullurl  # Make a variable of the url
+            if place:
+                try:
+                    search = requests.get(
+                        "https://fr.wikipedia.org/w/api.php?action=opensearch&search={}&limit=1&namespace=0&format=json"
+                            .format(place))
+                    result = search.json()
+                    text = ''.join(result[2])
+                    link_wiki = ''.join(result[3])
+                    positive_answer = (papy_answer(positive_answer_list) + text + susp)
+                    time.sleep(4)
+                    return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
+                except requests.exceptions.ConnectionError as e:
+                    time.sleep(2)
+                    return json.dumps({'answer': "J'arrive pas à me connecter à ma mémoire..."})
 
-                time.sleep(4)  # Wait a little before sending the answer with the link
-                return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
-
-            elif place == "les catacombes":
-                place_url = wiki_wiki.page("Catacombes_de_Paris")
-                text = place_url.summary[0:400]
-                text_susp = text + susp
-                positive_answer = (papy_answer(positive_answer_list) + text_susp)
-                link_wiki = place_url.fullurl
-
-                time.sleep(4)  # Wait a little before sending the answer with the link
-                return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
-
-            elif place == "canadiens de montréal":
-                place_url = wiki_wiki.page("Canadiens_de_Montréal")
-                text = place_url.summary[0:400]
-                text_susp = text + susp  # Put in var the 400 chars + ellipsis
-                positive_answer = (papy_answer(positive_answer_list) + text_susp)
-                link_wiki = place_url.fullurl  # Make a variable of the url
-
-                time.sleep(4)  # Wait a little before sending the answer with the link
-                return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
-
-            elif place == "canadiens de montreal":
-                place_url = wiki_wiki.page("Canadiens_de_Montréal")
-                text = place_url.summary[0:400]
-                text_susp = text + susp  # Put in var the 400 chars + ellipsis
-                positive_answer = (papy_answer(positive_answer_list) + text_susp)
-                link_wiki = place_url.fullurl  # Make a variable of the url
-
-                time.sleep(4)  # Wait a little before sending the answer with the link
-                return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
-
-            elif place == "charité sur loire":
-                place_url = wiki_wiki.page("La_Charité-sur-Loire")
-                text = place_url.summary[0:400]
-                text_susp = text + susp  # Put in var the 400 chars + ellipsis
-                positive_answer = (papy_answer(positive_answer_list) + text_susp)
-                link_wiki = place_url.fullurl  # Make a variable of the url
-
-                time.sleep(4)  # Wait a little before sending the answer with the link
-                return json.dumps({'status': 'OK', 'answer': positive_answer, 'link': link_wiki});
+            else:
+                pass
 
         except StopIteration:
             pass
@@ -112,7 +80,13 @@ def update_map():
 
             word_lowercase = words.lower()  # Put every words into lowercase -easiest way to parse-
             page_in_wiki = wiki_wiki.page(words)  # Then put in var the supposed url of the wiki page of the current word
-            exist = page_in_wiki.exists()  # And check if it exist
+
+            try:
+                exist = page_in_wiki.exists()  # And check if it exist
+            except requests.exceptions.ConnectionError as e:
+                time.sleep(2)
+                return json.dumps({'answer':"Je n'arrive pas à me connecter à ma mémoire mon gamin."
+                                                                 "Je crois qu'il y a un souci de connexion !"})
 
             if not exist:  # If the page doesn't exist ...
 
@@ -135,8 +109,7 @@ def update_map():
                         return json.dumps({'status': 'Ok', 'answer': negative_answer})  # And return it by the json reponse
 
                     else:
-                        text_susp = text + susp  # Put in var the 400 chars + ellipsis
-                        positive_answer = (papy_answer(positive_answer_list) + text_susp)  # Pick-up a random sentence from the positive answer's list
+                        positive_answer = (papy_answer(positive_answer_list) + text + susp)  # Pick-up a random sentence from the positive answer's list
                         link_wiki = page_to_read.fullurl  # Make a variable of the url
 
                         time.sleep(4)  # Wait a little before sending the answer with the link
