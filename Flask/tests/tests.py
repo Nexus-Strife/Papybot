@@ -1,5 +1,6 @@
 import random
-import pytest
+import wikipediaapi
+
 
 positive_answer_list = ["J'vais te dire c'que j'sais mon gamin. ", "J'vais t'dire mon lapin: ", "Oh je connais"
                         " des choses sur cet endroit ! ",
@@ -32,4 +33,15 @@ def test_papy_negative():
 def test_papy_address():
     var = papy_answer(know_address_list)
     assert var in know_address_list
+
+
+def test_wiki_api():
+
+    wiki_wiki = wikipediaapi.Wikipedia('fr')
+
+    page = "Paris"
+    page_test = wiki_wiki.page(page)
+    page_test_true = page_test.exists()
+    results = False
+    assert page_test_true is not results
 
