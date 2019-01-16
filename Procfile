@@ -1,1 +1,1 @@
-web: gunicorn Flask.exec:app
+web: python3 manage.py runserver
